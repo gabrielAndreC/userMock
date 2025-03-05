@@ -1,0 +1,161 @@
+openapi: 3.1.0
+info:
+  title: API Documentation
+  version: 1.0.0
+  description: API para la gestión de usuarios, autenticación y cuentas.
+tags:
+  - name: Account
+    description: Operaciones relacionadas con las cuentas de usuario.
+paths:
+  /account/register:
+    post:
+      tags:
+        - Account
+      summary: Registrar un nuevo usuario
+      description: Registra un nuevo usuario en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                lastName:
+                  type: string
+                  default: ""
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  description: Contraseña generada aleatoriamente si no se pasa.
+                age:
+                  type: integer
+                  default: 0
+                role:
+                  type: string
+                  default: "user"
+                cart:
+                  type: string
+                  format: objectId
+      responses:
+        '201':
+          description: Usuario registrado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Datos incorrectos.
+
+  /account/login:
+    post:
+      tags:
+        - Account
+      summary: Iniciar sesión
+      description: Permite a un usuario iniciar sesión en la aplicación.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Inicio de sesión exitoso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Credenciales incorrectas.
+
+  /account/google:
+    get:
+      tags:
+        - Account
+      summary: Iniciar sesión con Google
+      description: Inicia sesión utilizando las credenciales de Google.
+      responses:
+        '200':
+          description: Inicio de sesión exitoso con Google.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Error al autenticar con Google.
+
+  /account/auth:
+    post:
+      tags:
+        - Account
+      summary: Autenticación del usuario
+      description: Verifica la autenticación de un usuario en la aplicación.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Token del usuario
+      responses:
+        '200':
+          description: Autenticación exitosa.
+        '400':
+          description: Error en la autenticación.
+
+  /account/current:
+    get:
+      tags:
+        - Account
+      summary: Obtener usuario actual
+      description: Devuelve los datos del usuario que está actualmente autenticado.
+      responses:
+        '200':
+          description: Datos del usuario actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Usuario no autenticado.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del usuario
+        name:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        age:
+          type: integer
+        role:
+          type: string
+        cart:
+          type: string
+          description: ID del carrito asociado al usuario
+      required:
+        - name
+        - email
+        - password

@@ -1,0 +1,295 @@
+openapi: 3.1.0
+info:
+  title: API Documentation
+  version: 1.0.0
+  description: API para la gestión de productos y carritos de compras.
+tags:
+  - name: Index
+    description: Operaciones principales de la aplicación.
+paths:
+  /:
+    get:
+      tags:
+        - Index
+      summary: Obtener la página de inicio
+      description: Devuelve la página principal de la aplicación.
+      responses:
+        '200':
+          description: Página de inicio cargada.
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /products:
+    get:
+      tags:
+        - Index
+      summary: Obtener productos paginados
+      description: Devuelve una lista paginada de productos con enlaces para la paginación.
+      parameters:
+        - name: page
+          in: query
+          description: Número de página para la paginación.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: row
+          in: query
+          description: Número de elementos por página.
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lista de productos obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  isValid:
+                    type: boolean
+                  prevLink:
+                    type: string
+                  nextLink:
+                    type: string
+
+  /products/{pid}:
+    get:
+      tags:
+        - Index
+      summary: Obtener producto por ID
+      description: Devuelve un producto específico por su ID.
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado.
+
+  /carts/{cid}:
+    get:
+      tags:
+        - Index
+      summary: Obtener carrito por ID
+      description: Devuelve el carrito específico por su ID, con los productos en él.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Carrito encontrado con productos.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CartProduct'
+                  totalPrice:
+                    type: number
+                    format: float
+        '404':
+          description: Carrito no encontrado.
+
+    post:
+      tags:
+        - Index
+      summary: Actualizar cantidad de producto en el carrito
+      description: Actualiza la cantidad de un producto específico en el carrito.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                quantity:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Carrito actualizado correctamente.
+        '404':
+          description: Carrito no encontrado.
+
+  /carts/{cid}/purchase:
+    get:
+      tags:
+        - Index
+      summary: Vista de compra del carrito
+      description: Muestra los productos del carrito y su total para proceder con la compra.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vista de compra mostrada con los productos y total.
+        '404':
+          description: Carrito no encontrado.
+
+    post:
+      tags:
+        - Index
+      summary: Procesar compra del carrito
+      description: Procesa la compra del carrito. Si algún producto no tiene stock suficiente, la compra se cancela.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Compra realizada con éxito, devuelve el ticket de compra.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Carrito no encontrado.
+        '400':
+          description: Producto(s) sin stock suficiente.
+
+  /statusQuery:
+    get:
+      tags:
+        - Index
+      summary: Consultar estado de la aplicación
+      description: Devuelve el estado de la aplicación, incluyendo los productos y enlaces de paginación.
+      parameters:
+        - name: page
+          in: query
+          description: Número de página para la paginación.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: row
+          in: query
+          description: Número de elementos por página.
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Estado de la aplicación.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  nextLink:
+                    type: string
+                  prevLink:
+                    type: string
+
+  /realtimeproducts:
+    get:
+      tags:
+        - Index
+      summary: Obtener productos en tiempo real
+      description: Solo disponible para administradores. Devuelve los productos en tiempo real.
+      responses:
+        '200':
+          description: Productos en tiempo real obtenidos correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '403':
+          description: Acceso denegado. Solo administradores pueden ver esta ruta.
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        categ:
+          type: string
+        desc:
+          type: string
+        price:
+          type: number
+          format: float
+        stock:
+          type: integer
+    CartProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        categ:
+          type: string
+        desc:
+          type: string
+        price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+        totalPrice:
+          type: number
+          format: float
+    Ticket:
+      type: object
+      properties:
+        ticketNumber:
+          type: string
+        totalAmount:
+          type: number
+          format: float
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartProduct'
+

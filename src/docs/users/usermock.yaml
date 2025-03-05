@@ -1,0 +1,22 @@
+openapi: 3.1.0
+info:
+  title: API Documentation
+  version: 1.0.0
+  description: API para la generación de usuarios ficticios.
+tags:
+  - name: UserMock
+    description: Operaciones para crear usuarios de prueba.
+paths:
+  /api/mocks/usermock:
+    get:
+      tags:
+        - UserMock
+      summary: Crear un usuario ficticio
+      description: Crea un usuario ficticio con datos aleatorios para pruebas.
+      responses:
+        '200':
+          description: Usuario ficticio creado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
