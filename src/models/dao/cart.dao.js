@@ -57,9 +57,10 @@ class CartDao{
     async deleteCartProduct(cid, pid){
         const eliminarProd = await cartModel.updateOne(
             {_id: new ObjectId(cid)},
-            {$pull: {products: {id: pid}}}
+            {$pull: {products: {product: pid}}}
         )
-        return eliminarProd
+        const updatedCart = await cartModel.findById(cid)
+        return updatedCart
     }
 
     async clean(cid){

@@ -3,8 +3,18 @@ import userModel from "../user.model.js";
 import { ObjectId } from "mongodb";
 
 class UserDao{
+    async getAll(){
+        const users = await userModel.find()
+        return users
+    }
+
     async findById(id){
         const user = await userModel.findOne({_id: new ObjectId(id)})
+        return user
+    }
+    
+    async findByIdAndUpdate(id,data){
+        const user = await userModel.findByIdAndUpdate(id, data)
         return user
     }
 
@@ -36,6 +46,10 @@ class UserDao{
     async createDTO(filter){
         const dbUser = await userModel.findOne(filter).lean();
         const user = new UserResponseDto(dbUser)
+        return user
+    }
+    async deleteOne(id){
+        const user = await userModel.deleteOne(id)
         return user
     }
 }

@@ -11,6 +11,11 @@ class ProductDao{
         const product = productModel.findOne({_id: new ObjectId(id)})
         return product
     }
+    
+    async findByIdAndUpdate(id,data){
+        const product = await productModel.findByIdAndUpdate(id, data)
+        return product
+    }
 
     async findOneLean(id){
         const product = productModel.findOne({_id: new ObjectId(id)}).lean()

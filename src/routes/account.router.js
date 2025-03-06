@@ -9,15 +9,14 @@ const accountController = new AccountController;
 router.get("/register", (req,res)=>{
     res.render("register",{style:"main.css"})
 })
-
 router.post("/register", passport.authenticate("register"), accountController.register)
 
 
 router.get('/login', (req,res)=>{
     res.render("login",{style:"main.css"})
 })
-
 router.post('/login', accountController.login)
+
 
 router.get("/google", passport.authenticate("google", { 
     scope: ["https://www.googleapis.com/auth/userinfo.email",

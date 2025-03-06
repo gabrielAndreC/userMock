@@ -44,9 +44,9 @@ const app = express()
 if (cluster.isPrimary){
     console.log("proceso primario")
     const httpServer = app.listen(8000, ()=>{console.log("puerto 8000")});
-    /*for(let i = 0; i < cpus().length; i++){
+    for(let i = 0; i < cpus().length; i++){
         cluster.fork()
-    }*/
+    }
    cluster.fork()
 }
 

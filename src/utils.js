@@ -18,7 +18,7 @@ export const createToken = (user)=>{
 export const verifyToken = (token) =>{
  try {
     const decode = jwt.verify(token, 'clave-re-secreta');
-
+    
     return decode;
 
  } catch (error) {

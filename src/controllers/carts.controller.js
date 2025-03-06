@@ -52,7 +52,8 @@ export class CartsController{
                 res.status(200).json(cart)
             }
             else{
-                cartAdded = cartService.addToCart(cart, req.params.cid, prodId, prodQ)
+                const cartAdded = await cartService.addToCart(cart, req.params.cid, prodId, prodQ)
+
                 res.status(200).json(cartAdded)
             }
         }
@@ -62,7 +63,7 @@ export class CartsController{
     }
 
     async updateQuantity(req,res){
-        const actualizarQuantity = cartService.updateOne(req.params.cid, prodId, {$set: {"products.$.quantity": req.body.quantity}})
+        const actualizarQuantity = await cartService.updateOne(req.params.cid, req.params.pid, {$set: {"products.$.quantity": req.body.quantity}})
         let cart = await cartService.findOne(req.params.cid);
         res.status(200).json(cart)
     }
